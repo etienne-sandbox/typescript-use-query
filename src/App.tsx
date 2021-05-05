@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Ky from "ky";
 import * as z from "zod";
+import { useQuery } from "./useQuery";
 
 const WorkoutSchema = z.object({
   date: z.string(),
@@ -14,35 +15,51 @@ const WorkoutSchema = z.object({
   userName: z.string(),
 });
 
-type Workout = z.infer<typeof WorkoutSchema>;
-
-const DataSchema = z.object({
+const GetWorkoutsSchema = z.object({
   results: z.array(WorkoutSchema),
   total: z.number(),
 });
-type Data = z.infer<typeof DataSchema>;
+type GetWorkouts = z.infer<typeof GetWorkoutsSchema>;
+
+const PlaceSchema = z.object({
+  slug: z.string(),
+  name: z.string(),
+  image: z.string(),
+  workoutCount: z.number(),
+});
+
+const GetPlacesSchema = z.object({
+  results: z.array(PlaceSchema),
+  total: z.number(),
+});
 
 export function App() {
-  const [data, setData] = useState<Data | null>(null);
-
-  useEffect(() => {
-    const getData = async () => {
-      const json = await Ky.get("http://localhost:3001/workouts").json();
-      const data = DataSchema.parse(json);
-      setData(data);
-    };
-    getData();
-  }, []);
+  const workouts = useQuery(
+    "http://localhost:3001/workouts",
+    GetWorkoutsSchema
+  );
+  const places = useQuery("http://localhost:3001/places", GetPlacesSchema);
 
   return (
     <div className="App">
-      {data === null ? (
-        <p>No data</p>
-      ) : (
-        data.results.map((workout) => {
-          return <div key={workout.id}>{workout.speed.toFixed(2)} km/h</div>;
-        })
-      )}
+      <div>
+        {workouts === null ? (
+          <p>No data</p>
+        ) : (
+          workouts.results.map((workout) => {
+            return <div key={workout.id}>{workout.speed.toFixed(2)} km/h</div>;
+          })
+        )}
+      </div>
+      <div>
+        {places === null ? (
+          <p>No data</p>
+        ) : (
+          places.results.map((place) => {
+            return <div key={place.slug}>{place.name}</div>;
+          })
+        )}
+      </div>
     </div>
   );
 }
