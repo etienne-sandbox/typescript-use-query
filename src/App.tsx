@@ -1,22 +1,25 @@
 import React, { useEffect, useState } from "react";
 import Ky from "ky";
+import * as z from "zod";
 
-interface Workout {
-  id: string;
-  date: string;
-  place: string;
-  distance: number;
-  duration: number;
-  user: string;
-  placeName: string;
-  speed: number;
-  userName: string;
-}
+const WorkoutSchema = z.object({
+  id: z.string(),
+  date: z.string(),
+  place: z.string(),
+  distance: z.number(),
+  duration: z.number(),
+  user: z.string(),
+  placename: z.string(),
+  speed: z.number(),
+  userName: z.string(),
+});
 
-type WorkoutsResults = {
-  results: Array<Workout>;
-  total: number;
-};
+const WorkoutsResultsSchema = z.object({
+  total: z.number(),
+  results: z.array(WorkoutSchema),
+});
+
+type WorkoutsResults = z.infer<typeof WorkoutsResultsSchema>;
 
 export function App() {
   const [workouts, setWorkouts] = useState<WorkoutsResults | null>(null);
@@ -24,12 +27,13 @@ export function App() {
   useEffect(() => {
     let cancelled = false;
     Ky.get("http://localhost:3001/workouts")
-      .json<WorkoutsResults>()
+      .json()
       .then((data) => {
         if (cancelled) {
           return;
         }
-        setWorkouts(data);
+        const result = WorkoutsResultsSchema.parse(data);
+        setWorkouts(result);
       });
 
     return () => {
