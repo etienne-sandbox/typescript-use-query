@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import Ky from "ky";
 import * as z from "zod";
 import { useQuery } from "./useQuery";
+import { ResourceHandler } from "./ResourceHandler";
 
 const WorkoutSchema = z.object({
   id: z.string(),
@@ -33,35 +34,51 @@ const PlacesResultsSchema = z.object({
 });
 
 export function App() {
-  const workouts = useQuery(
+  const workoutsResource = useQuery(
     "http://localhost:3001/workouts",
     WorkoutsResultsSchema
   );
-  const places = useQuery("http://localhost:3001/places", PlacesResultsSchema);
+  const placesResource = useQuery(
+    "http://localhost:3001/places",
+    PlacesResultsSchema
+  );
 
   return (
     <div className="App">
       <div>
-        {workouts === null ? (
-          <p>Loading...</p>
-        ) : (
-          workouts.results.map((workout) => {
+        <ResourceHandler
+          resource={workoutsResource}
+          handleRejected={() => <h1>Oops</h1>}
+          handleResolved={(workouts) => {
             return (
-              <div key={workout.id}>
-                {workout.userName} - {workout.distance}m - {workout.duration}min
+              <div>
+                {workouts.results.map((workout) => {
+                  return (
+                    <div key={workout.id}>
+                      {workout.userName} - {workout.distance}m -{" "}
+                      {workout.duration}
+                      min
+                    </div>
+                  );
+                })}
               </div>
             );
-          })
-        )}
+          }}
+        />
       </div>
       <div>
-        {places === null ? (
-          <p>Loading...</p>
-        ) : (
-          places.results.map((place) => {
-            return <div key={place.slug}>{place.name}</div>;
-          })
-        )}
+        <ResourceHandler
+          resource={placesResource}
+          handleResolved={(places) => {
+            return (
+              <div>
+                {places.results.map((place) => {
+                  return <div key={place.slug}>{place.name}</div>;
+                })}
+              </div>
+            );
+          }}
+        />
       </div>
     </div>
   );
