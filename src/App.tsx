@@ -9,7 +9,7 @@ const WorkoutSchema = z.object({
   distance: z.number(),
   duration: z.number(),
   user: z.string(),
-  placename: z.string(),
+  placeName: z.string(),
   speed: z.number(),
   userName: z.string(),
 });
