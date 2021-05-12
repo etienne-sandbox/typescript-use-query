@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Ky from "ky";
 import * as z from "zod";
+import { useQuery } from "./useQuery";
 
 const WorkoutSchema = z.object({
   id: z.string(),
@@ -19,8 +20,6 @@ const WorkoutsResultsSchema = z.object({
   results: z.array(WorkoutSchema),
 });
 
-type WorkoutsResults = z.infer<typeof WorkoutsResultsSchema>;
-
 const PlaceSchema = z.object({
   image: z.string(),
   name: z.string(),
@@ -28,51 +27,17 @@ const PlaceSchema = z.object({
   workoutCount: z.number(),
 });
 
-const PlacesResultSchema = z.object({
+const PlacesResultsSchema = z.object({
   total: z.number(),
   results: z.array(PlaceSchema),
 });
 
-type PlacesResult = z.infer<typeof PlacesResultSchema>;
-
 export function App() {
-  const [workouts, setWorkouts] = useState<WorkoutsResults | null>(null);
-
-  useEffect(() => {
-    let cancelled = false;
-    Ky.get("http://localhost:3001/workouts")
-      .json()
-      .then((data) => {
-        if (cancelled) {
-          return;
-        }
-        const result = WorkoutsResultsSchema.parse(data);
-        setWorkouts(result);
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  const [places, setPlaces] = useState<PlacesResult | null>(null);
-
-  useEffect(() => {
-    let cancelled = false;
-    Ky.get("http://localhost:3001/places")
-      .json()
-      .then((data) => {
-        if (cancelled) {
-          return;
-        }
-        const result = PlacesResultSchema.parse(data);
-        setPlaces(result);
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+  const workouts = useQuery(
+    "http://localhost:3001/workouts",
+    WorkoutsResultsSchema
+  );
+  const places = useQuery("http://localhost:3001/places", PlacesResultsSchema);
 
   return (
     <div className="App">
