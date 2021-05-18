@@ -32,33 +32,45 @@ const PlacesResultSchema = z.object({
 });
 
 function App(): JSX.Element {
-  const workouts = useQuery(
+  const workoutsRes = useQuery(
     "http://localhost:3001/workouts",
     WorkoutsResultSchema
   );
-  const places = useQuery("http://localhost:3001/places", PlacesResultSchema);
+  const placesRes = useQuery(
+    "http://localhost:3001/places",
+    PlacesResultSchema
+  );
 
   return (
     <div className="App">
       <div>
-        {workouts === null ? (
-          <p>Loading...</p>
-        ) : (
-          <ul>
-            {workouts.results.map((workout) => (
-              <li key={workout.id}>
-                {workout.userName} - {workout.duration}min
-              </li>
-            ))}
-          </ul>
-        )}
+        {(() => {
+          if (workoutsRes.status === "pending") {
+            return <p>Loading...</p>;
+          }
+          if (workoutsRes.status === "resolved") {
+            return (
+              <ul>
+                {workoutsRes.data.results.map((workout) => (
+                  <li key={workout.id}>
+                    {workout.userName} - {workout.duration}min
+                  </li>
+                ))}
+              </ul>
+            );
+          }
+          if (workoutsRes.status === "rejected") {
+            return <p>Error: {String(workoutsRes.error)}</p>;
+          }
+          return null;
+        })()}
       </div>
       <div>
-        {places === null ? (
+        {placesRes.status !== "resolved" ? (
           <p>Loading...</p>
         ) : (
           <ul>
-            {places.results.map((place) => (
+            {placesRes.data.results.map((place) => (
               <li key={place.slug}>{place.name}</li>
             ))}
           </ul>

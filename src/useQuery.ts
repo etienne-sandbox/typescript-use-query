@@ -7,17 +7,21 @@ type Resource<T> =
   | { status: "resolved"; data: T }
   | { status: "rejected"; error: unknown };
 
-export function useQuery<T>(url: string, schema: z.Schema<T>): T | null {
-  const [data, setData] = useState<T | null>(null);
+export function useQuery<T>(url: string, schema: z.Schema<T>): Resource<T> {
+  const [resource, setResource] = useState<Resource<T>>({ status: "void" });
 
   useEffect(() => {
+    setResource({ status: "pending" });
     fetch(url)
       .then((res) => res.json())
       .then((data: unknown) => {
         const result = schema.parse(data);
-        setData(result);
+        setResource({ status: "resolved", data: result });
+      })
+      .catch((err) => {
+        setResource({ status: "rejected", error: err });
       });
   }, []);
 
-  return data;
+  return resource;
 }
