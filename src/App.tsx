@@ -1,38 +1,42 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useQuery } from "./useQuery";
+import * as z from "zod";
 
-interface Workout {
-  id: string;
-  date: string;
-  place: string;
-  distance: number;
-  duration: number;
-  user: string;
-  placeName: string;
-  speed: number;
-  userName: string;
-}
+const WorkoutSchema = z.object({
+  id: z.string(),
+  date: z.string(),
+  place: z.string(),
+  distance: z.number(),
+  duration: z.number(),
+  user: z.string(),
+  placeName: z.string(),
+  speed: z.number(),
+  username: z.string(),
+});
 
-interface WorkoutsResult {
-  results: Array<Workout>;
-  total: number;
-}
+const WorkoutsResultSchema = z.object({
+  results: z.array(WorkoutSchema),
+  total: z.number(),
+});
 
-interface Place {
-  image: string;
-  name: string;
-  slug: string;
-  workoutCount: number;
-}
+const PlaceSchema = z.object({
+  image: z.string(),
+  name: z.string(),
+  slug: z.string(),
+  workoutCount: z.number(),
+});
 
-interface PlacesResult {
-  results: Array<Place>;
-  total: number;
-}
+const PlacesResultSchema = z.object({
+  results: z.array(PlaceSchema),
+  total: z.number(),
+});
 
 function App(): JSX.Element {
-  const workouts = useQuery<WorkoutsResult>("http://localhost:3001/workouts");
-  const places = useQuery<PlacesResult>("http://localhost:3001/places");
+  const workouts = useQuery(
+    "http://localhost:3001/workouts",
+    WorkoutsResultSchema
+  );
+  const places = useQuery("http://localhost:3001/places", PlacesResultSchema);
 
   return (
     <div className="App">
@@ -43,7 +47,7 @@ function App(): JSX.Element {
           <ul>
             {workouts.results.map((workout) => (
               <li key={workout.id}>
-                {workout.userName} - {workout.duration}min
+                {workout.username} - {workout.duration}min
               </li>
             ))}
           </ul>
