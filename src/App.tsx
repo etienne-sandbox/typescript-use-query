@@ -11,7 +11,7 @@ const WorkoutSchema = z.object({
   user: z.string(),
   placeName: z.string(),
   speed: z.number(),
-  username: z.string(),
+  userName: z.string(),
 });
 
 const WorkoutsResultSchema = z.object({
@@ -47,7 +47,7 @@ function App(): JSX.Element {
           <ul>
             {workouts.results.map((workout) => (
               <li key={workout.id}>
-                {workout.username} - {workout.duration}min
+                {workout.userName} - {workout.duration}min
               </li>
             ))}
           </ul>
