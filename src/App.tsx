@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useQuery } from "./useQuery";
 
 interface Workout {
   id: string;
@@ -30,25 +31,8 @@ interface PlacesResult {
 }
 
 function App(): JSX.Element {
-  const [workouts, setWorkouts] = useState<WorkoutsResult | null>(null);
-
-  useEffect(() => {
-    fetch("http://localhost:3001/workouts")
-      .then((res) => res.json())
-      .then((data) => {
-        setWorkouts(data);
-      });
-  }, []);
-
-  const [places, setPlaces] = useState<PlacesResult | null>(null);
-
-  useEffect(() => {
-    fetch("http://localhost:3001/places")
-      .then((res) => res.json())
-      .then((data) => {
-        setPlaces(data);
-      });
-  }, []);
+  const workouts = useQuery<WorkoutsResult>("http://localhost:3001/workouts");
+  const places = useQuery<PlacesResult>("http://localhost:3001/places");
 
   return (
     <div className="App">
