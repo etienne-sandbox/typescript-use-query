@@ -17,6 +17,18 @@ interface WorkoutsResult {
   total: number;
 }
 
+interface Place {
+  image: string;
+  name: string;
+  slug: string;
+  workoutCount: number;
+}
+
+interface PlacesResult {
+  results: Array<Place>;
+  total: number;
+}
+
 function App(): JSX.Element {
   const [workouts, setWorkouts] = useState<WorkoutsResult | null>(null);
 
@@ -28,19 +40,42 @@ function App(): JSX.Element {
       });
   }, []);
 
+  const [places, setPlaces] = useState<PlacesResult | null>(null);
+
+  useEffect(() => {
+    fetch("http://localhost:3001/places")
+      .then((res) => res.json())
+      .then((data) => {
+        setPlaces(data);
+      });
+  }, []);
+
   return (
     <div className="App">
-      {workouts === null ? (
-        <p>Loading...</p>
-      ) : (
-        <ul>
-          {workouts.results.map((workout) => (
-            <li key={workout.id}>
-              {workout.userName} - {workout.duration}min
-            </li>
-          ))}
-        </ul>
-      )}
+      <div>
+        {workouts === null ? (
+          <p>Loading...</p>
+        ) : (
+          <ul>
+            {workouts.results.map((workout) => (
+              <li key={workout.id}>
+                {workout.userName} - {workout.duration}min
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+      <div>
+        {places === null ? (
+          <p>Loading...</p>
+        ) : (
+          <ul>
+            {places.results.map((place) => (
+              <li key={place.slug}>{place.name}</li>
+            ))}
+          </ul>
+        )}
+      </div>
     </div>
   );
 }
