@@ -1,6 +1,7 @@
 import React from "react";
 import { useQuery } from "./useQuery";
 import * as z from "zod";
+import { ResourceHandler } from "./ResourceHandler";
 
 const WorkoutSchema = z.object({
   id: z.string(),
@@ -23,7 +24,7 @@ const PlaceSchema = z.object({
   image: z.string(),
   name: z.string(),
   slug: z.string(),
-  workoutCount: z.number(),
+  workoutcount: z.number(),
 });
 
 const PlacesResultSchema = z.object({
@@ -43,39 +44,35 @@ function App(): JSX.Element {
 
   return (
     <div className="App">
-      <div>
-        {(() => {
-          if (workoutsRes.status === "pending") {
-            return <p>Loading...</p>;
-          }
-          if (workoutsRes.status === "resolved") {
-            return (
-              <ul>
-                {workoutsRes.data.results.map((workout) => (
-                  <li key={workout.id}>
-                    {workout.userName} - {workout.duration}min
-                  </li>
-                ))}
-              </ul>
-            );
-          }
-          if (workoutsRes.status === "rejected") {
-            return <p>Error: {String(workoutsRes.error)}</p>;
-          }
-          return null;
-        })()}
-      </div>
-      <div>
-        {placesRes.status !== "resolved" ? (
-          <p>Loading...</p>
-        ) : (
-          <ul>
-            {placesRes.data.results.map((place) => (
-              <li key={place.slug}>{place.name}</li>
-            ))}
-          </ul>
-        )}
-      </div>
+      <ResourceHandler
+        resource={workoutsRes}
+        handleResolved={(workouts) => {
+          return (
+            <ul>
+              {workouts.results.map((workout) => (
+                <li key={workout.id}>
+                  {workout.userName} - {workout.duration}min
+                </li>
+              ))}
+            </ul>
+          );
+        }}
+        handleRejected={() => {
+          return <p>Cannot fetch workouts !</p>;
+        }}
+      />
+      <ResourceHandler
+        resource={placesRes}
+        handleResolved={(places) => {
+          return (
+            <ul>
+              {places.results.map((place) => (
+                <li key={place.slug}>{place.name}</li>
+              ))}
+            </ul>
+          );
+        }}
+      />
     </div>
   );
 }

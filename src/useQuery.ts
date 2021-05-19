@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import * as z from "zod";
 
-type Resource<T> =
+export type Resource<T> =
   | { status: "void" }
   | { status: "pending" }
   | { status: "resolved"; data: T }
