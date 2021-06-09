@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-type Resource<Data> =
+export type Resource<Data> =
   | { status: "void" }
   | { status: "pending" }
   | { status: "resolved"; data: Data }
