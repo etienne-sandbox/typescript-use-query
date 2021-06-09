@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useQuery } from "./useQuery";
 
 interface Workout {
   id: string;
@@ -30,37 +31,8 @@ interface PlacesResult {
 }
 
 function App() {
-  const [workouts, setWorkouts] = useState<WorkoutsResult | null>(null);
-
-  useEffect(() => {
-    let canceled = false;
-    fetch("http://localhost:3001/workouts").then(async (response) => {
-      const data = await response.json();
-      if (canceled) {
-        return;
-      }
-      setWorkouts(data);
-    });
-    return () => {
-      canceled = true;
-    };
-  }, []);
-
-  const [places, setPlaces] = useState<PlacesResult | null>(null);
-
-  useEffect(() => {
-    let canceled = false;
-    fetch("http://localhost:3001/places").then(async (response) => {
-      const data = await response.json();
-      if (canceled) {
-        return;
-      }
-      setPlaces(data);
-    });
-    return () => {
-      canceled = true;
-    };
-  }, []);
+  const workouts = useQuery<WorkoutsResult>("http://localhost:3001/workouts");
+  const places = useQuery<PlacesResult>("http://localhost:3001/places");
 
   return (
     <div className="App">
