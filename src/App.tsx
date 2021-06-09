@@ -31,32 +31,46 @@ interface PlacesResult {
 }
 
 function App() {
-  const workouts = useQuery<WorkoutsResult>("http://localhost:3001/workouts");
-  const places = useQuery<PlacesResult>("http://localhost:3001/places");
+  const workoutsRes = useQuery<WorkoutsResult>(
+    "http://localhost:3001/workouts"
+  );
+  const placesRes = useQuery<PlacesResult>("http://localhost:3001/places");
 
   return (
     <div className="App">
       <div>
         <h2>Workouts</h2>
-        {workouts === null ? (
-          <p>Loading...</p>
-        ) : (
-          <div>
-            {workouts.results.map((workout) => (
-              <p key={workout.id}>
-                {workout.userName} - {workout.distance}m
-              </p>
-            ))}
-          </div>
-        )}
+        {(() => {
+          if (workoutsRes.status === "void") {
+            return null;
+          }
+          if (workoutsRes.status === "rejected") {
+            return <p>Error</p>;
+          }
+          if (workoutsRes.status === "pending") {
+            return <p>Loading...</p>;
+          }
+          if (workoutsRes.status === "resolved") {
+            return (
+              <div>
+                {workoutsRes.data.results.map((workout) => (
+                  <p key={workout.id}>
+                    {workout.userName} - {workout.distance}m
+                  </p>
+                ))}
+              </div>
+            );
+          }
+          return null;
+        })()}
       </div>
       <div>
         <h2>Places</h2>
-        {places === null ? (
+        {placesRes.status !== "resolved" ? (
           <p>Loading...</p>
         ) : (
           <div>
-            {places.results.map((place) => (
+            {placesRes.data.results.map((place) => (
               <div key={place.slug}>
                 <p>{place.name}</p>
                 <img
