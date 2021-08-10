@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import * as z from "zod";
+import { useQuery } from "./useQuery";
+import { ResourceHandler } from "./ResourceHandler";
 
 const PlaceSchema = z.object({
   image: z.string(),
@@ -9,8 +11,6 @@ const PlaceSchema = z.object({
 });
 
 const PlacesResponseSchema = responseSchema(PlaceSchema);
-
-type PlacesResponse = z.infer<typeof PlacesResponseSchema>;
 
 const WorkoutSchema = z.object({
   id: z.string(),
@@ -33,82 +33,63 @@ function responseSchema<T>(schema: z.Schema<T>) {
 
 const WorkoutResponseSchema = responseSchema(WorkoutSchema);
 
-type WorkoutResponse = z.infer<typeof WorkoutResponseSchema>;
-
 async function fetchPlaces() {
   const response = await fetch("http://localhost:3001/places");
+  if (!response.ok) {
+    throw new Error("Invalid API response");
+  }
   const data = await response.json();
-  return PlacesResponseSchema.parse(data);
+  return data;
 }
 
 async function fetchWorkouts() {
   const response = await fetch("http://localhost:3001/workouts");
   const data = await response.json();
-  return WorkoutResponseSchema.parse(data);
+  return data;
 }
 
 function Places() {
-  const [places, setPlaces] = useState<PlacesResponse | null>(null);
-
-  useEffect(() => {
-    let canceled = false;
-    fetchPlaces().then((places) => {
-      if (canceled) {
-        return;
-      }
-      setPlaces(places);
-    });
-    return () => {
-      canceled = true;
-    };
-  }, []);
+  const placesRes = useQuery(fetchPlaces, PlacesResponseSchema);
 
   return (
     <div className="App">
       Hello React
-      {places === null ? (
-        <p>Loading...</p>
-      ) : (
-        <ul>
-          {places.results.map((place) => (
-            <li key={place.slug}>{place.name}</li>
-          ))}
-        </ul>
-      )}
+      <ResourceHandler
+        resource={placesRes}
+        renderResolved={(places) => {
+          return (
+            <ul>
+              {places.results.map((place) => (
+                <li key={place.slug}>{place.name}</li>
+              ))}
+            </ul>
+          );
+        }}
+      />
     </div>
   );
 }
 
 function Workouts() {
-  const [workouts, setWorkouts] = useState<WorkoutResponse | null>(null);
-
-  useEffect(() => {
-    let canceled = false;
-    fetchWorkouts().then((workouts) => {
-      if (canceled) {
-        return;
-      }
-      setWorkouts(workouts);
-    });
-    return () => {
-      canceled = true;
-    };
-  }, []);
+  const workoutsRes = useQuery(fetchWorkouts, WorkoutResponseSchema);
 
   return (
     <div className="App">
       Hello React
-      {workouts === null ? (
-        <p>Loading...</p>
-      ) : (
-        <ul>
-          {workouts.results.map((workout) => (
-            <li key={workout.id}>
-              {workout.userName} - {workout.distance / 1000}km
-            </li>
-          ))}
-        </ul>
-      )}
+      <ResourceHandler
+        resource={workoutsRes}
+        renderResolved={(workouts) => {
+          return (
+            <ul>
+              {workouts.results.map((workout) => (
+                <li key={workout.id}>
+                  {workout.userName} - {workout.distance / 1000}km
+                </li>
+              ))}
+            </ul>
+          );
+        }}
+      />
     </div>
   );
 }
