@@ -1,4 +1,4 @@
-import { BlackBox } from "./BlackBox";
+import { BlackBoxClass as BlackBox } from "./BlackBoxClass";
 
 const blackbox = BlackBox.createEmpty();
 
@@ -14,4 +14,5 @@ const string = blackbox2.get(StringContext);
 console.log({
   num,
   string,
+  isBlackBox: blackbox instanceof BlackBox,
 });
