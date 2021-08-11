@@ -2,7 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
 import App from "./App";
-import "./compose/index";
+import "./compose/middleware2";
 
 ReactDOM.render(
   <React.StrictMode>
