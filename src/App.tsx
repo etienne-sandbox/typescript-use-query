@@ -1,21 +1,5 @@
 import React, { useEffect, useState } from "react";
-
-type Workout = {
-  id: string;
-  date: string;
-  place: string;
-  distance: number;
-  duration: number;
-  user: string;
-  placeName: string;
-  speed: number;
-  userName: string;
-};
-
-type WorkoutsResult = {
-  results: Array<Workout>;
-  total: number;
-};
+import { useWorkouts } from "./useWorkouts";
 
 type Place = {
   image: string;
@@ -30,15 +14,7 @@ type PlacesResult = {
 };
 
 function App() {
-  const [workouts, setWorkouts] = useState<WorkoutsResult | null>(null);
-
-  useEffect(() => {
-    fetch("http://localhost:3001/workouts")
-      .then((res) => res.json())
-      .then((data: WorkoutsResult) => {
-        setWorkouts(data);
-      });
-  }, []);
+  const workouts = useWorkouts();
 
   const [places, setPlaces] = useState<PlacesResult | null>(null);
 
