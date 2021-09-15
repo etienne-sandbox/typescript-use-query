@@ -1,6 +1,7 @@
 import React from "react";
 import { useResource } from "./useResource";
 import * as z from "zod";
+import { ResourceHandler } from "./ResourceHandler";
 
 const PlaceSchema = z.object({
   image: z.string(),
@@ -22,7 +23,7 @@ const WorkoutSchema = z.object({
   speed: z.number(),
   userName: z.string(),
   date: z.string(),
-  user__: z.string(),
+  user: z.string(),
   placeName: z.string(),
 });
 
@@ -46,39 +47,34 @@ function App() {
     <div className="App">
       <div>
         <h2>Workouts</h2>
-        {(() => {
-          if (workouts.status === "rejected") {
-            return <p>oops error</p>;
-          }
-          if (workouts.status === "parsing-error") {
-            return <p>Invalid API response</p>;
-          }
-          if (workouts.status === "resolved") {
-            return workouts.data.results.map((workout) => (
+        <ResourceHandler
+          resource={workouts}
+          renderResolved={(workouts) => {
+            return workouts.results.map((workout) => (
               <p key={workout.id}>
                 {workout.userName.toUpperCase()} - {workout.distance}m -{" "}
                 {workout.duration} min
               </p>
             ));
-          }
-          return <p>Loading...</p>;
-        })()}
+          }}
+        />
       </div>
       <div>
         <h2>Places</h2>
-        {places.status !== "resolved" ? (
-          <p>Loading...</p>
-        ) : (
-          places.data.results.map((place) => (
-            <div key={place.slug}>
-              <h3>{place.name}</h3>
-              <img
-                src={`http://localhost:3001/public${place.image}`}
-                style={{ height: 100 }}
-              />
-            </div>
-          ))
-        )}
+        <ResourceHandler
+          resource={places}
+          renderResolved={(places) => {
+            return places.results.map((place) => (
+              <div key={place.slug}>
+                <h3>{place.name}</h3>
+                <img
+                  src={`http://localhost:3001/public${place.image}`}
+                  style={{ height: 100 }}
+                />
+              </div>
+            ));
+          }}
+        />
       </div>
     </div>
   );
