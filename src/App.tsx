@@ -17,6 +17,18 @@ type WorkoutsResult = {
   total: number;
 };
 
+type Place = {
+  image: string;
+  name: string;
+  slug: string;
+  workoutCount: number;
+};
+
+type PlacesResult = {
+  results: Array<Place>;
+  total: number;
+};
+
 function App() {
   const [workouts, setWorkouts] = useState<WorkoutsResult | null>(null);
 
@@ -25,6 +37,16 @@ function App() {
       .then((res) => res.json())
       .then((data: WorkoutsResult) => {
         setWorkouts(data);
+      });
+  }, []);
+
+  const [places, setPlaces] = useState<PlacesResult | null>(null);
+
+  useEffect(() => {
+    fetch("http://localhost:3001/places")
+      .then((res) => res.json())
+      .then((data: PlacesResult) => {
+        setPlaces(data);
       });
   }, []);
 
@@ -40,6 +62,22 @@ function App() {
               {workout.userName.toUpperCase()} - {workout.distance}m -{" "}
               {workout.duration} min
             </p>
+          ))
+        )}
+      </div>
+      <div>
+        <h2>Places</h2>
+        {places === null ? (
+          <p>Loading...</p>
+        ) : (
+          places.results.map((place) => (
+            <div key={place.slug}>
+              <h3>{place.name}</h3>
+              <img
+                src={`http://localhost:3001/public${place.image}`}
+                style={{ height: 100 }}
+              />
+            </div>
           ))
         )}
       </div>
