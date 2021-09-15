@@ -1,30 +1,46 @@
-import React, { useEffect, useState } from "react";
-import { useWorkouts } from "./useWorkouts";
+import React from "react";
+import { useResource } from "./useResource";
+import * as z from "zod";
 
-type Place = {
-  image: string;
-  name: string;
-  slug: string;
-  workoutCount: number;
-};
+const PlaceSchema = z.object({
+  image: z.string(),
+  name: z.string(),
+  slug: z.string(),
+  workoutCount: z.number(),
+});
 
-type PlacesResult = {
-  results: Array<Place>;
-  total: number;
-};
+const PlacesResultSchema = z.object({
+  results: z.array(PlaceSchema),
+  total: z.number(),
+});
+
+const WorkoutSchema = z.object({
+  id: z.string(),
+  place: z.string(),
+  distance: z.number(),
+  duration: z.number(),
+  speed: z.number(),
+  userName: z.string(),
+  date: z.string(),
+  user: z.string(),
+  placeName: z.string(),
+});
+
+const WorkoutsResultSchema = z.object({
+  results: z.array(WorkoutSchema),
+  total: z.number().min(0),
+});
 
 function App() {
-  const workouts = useWorkouts();
+  const workouts = useResource(
+    "http://localhost:3001/workouts",
+    WorkoutsResultSchema
+  );
 
-  const [places, setPlaces] = useState<PlacesResult | null>(null);
-
-  useEffect(() => {
-    fetch("http://localhost:3001/places")
-      .then((res) => res.json())
-      .then((data: PlacesResult) => {
-        setPlaces(data);
-      });
-  }, []);
+  const places = useResource(
+    "http://localhost:3001/places",
+    PlacesResultSchema
+  );
 
   return (
     <div className="App">

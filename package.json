@@ -10,7 +10,8 @@
   },
   "dependencies": {
     "react": "^17.0.0",
-    "react-dom": "^17.0.0"
+    "react-dom": "^17.0.0",
+    "zod": "^3.8.2"
   },
   "devDependencies": {
     "@instant-api/sport-session-tracker": "^1.0.1",
