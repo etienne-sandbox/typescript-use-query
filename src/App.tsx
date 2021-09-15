@@ -22,7 +22,7 @@ const WorkoutSchema = z.object({
   speed: z.number(),
   userName: z.string(),
   date: z.string(),
-  user: z.string(),
+  user__: z.string(),
   placeName: z.string(),
 });
 
@@ -46,23 +46,30 @@ function App() {
     <div className="App">
       <div>
         <h2>Workouts</h2>
-        {workouts === null ? (
-          <p>Loading...</p>
-        ) : (
-          workouts.results.map((workout) => (
-            <p key={workout.id}>
-              {workout.userName.toUpperCase()} - {workout.distance}m -{" "}
-              {workout.duration} min
-            </p>
-          ))
-        )}
+        {(() => {
+          if (workouts.status === "rejected") {
+            return <p>oops error</p>;
+          }
+          if (workouts.status === "parsing-error") {
+            return <p>Invalid API response</p>;
+          }
+          if (workouts.status === "resolved") {
+            return workouts.data.results.map((workout) => (
+              <p key={workout.id}>
+                {workout.userName.toUpperCase()} - {workout.distance}m -{" "}
+                {workout.duration} min
+              </p>
+            ));
+          }
+          return <p>Loading...</p>;
+        })()}
       </div>
       <div>
         <h2>Places</h2>
-        {places === null ? (
+        {places.status !== "resolved" ? (
           <p>Loading...</p>
         ) : (
-          places.results.map((place) => (
+          places.data.results.map((place) => (
             <div key={place.slug}>
               <h3>{place.name}</h3>
               <img
