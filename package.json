@@ -5,8 +5,8 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "serve": "vite preview",
-    "start-api": "@instant-api/sport-session-tracker",
-    "start-slow-api": "@instant-api/sport-session-tracker --slow"
+    "start-api": "sport-session-tracker",
+    "start-slow-api": "sport-session-tracker --slow"
   },
   "dependencies": {
     "react": "^17.0.0",
