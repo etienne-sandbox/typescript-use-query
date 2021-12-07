@@ -18,8 +18,6 @@ const WorkoutsResultSchema = zod.object({
   results: zod.array(WorkoutSchema),
 });
 
-type WorkoutsResult = zod.infer<typeof WorkoutsResultSchema>;
-
 const PlaceSchema = zod.object({
   image: zod.string(),
   name: zod.string(),
@@ -31,8 +29,6 @@ const PlacesResultSchema = zod.object({
   total: zod.number(),
   results: zod.array(PlaceSchema),
 });
-
-type PlacesResult = zod.infer<typeof PlacesResultSchema>;
 
 type ApiResult<Item> = {
   total: number;
