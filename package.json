@@ -4,9 +4,11 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "serve": "vite preview"
+    "serve": "vite preview",
+    "api:start": "sport-session-tracker"
   },
   "dependencies": {
+    "@instant-api/sport-session-tracker": "^1.0.1",
     "react": "^17.0.0",
     "react-dom": "^17.0.0"
   },
