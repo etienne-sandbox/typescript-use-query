@@ -34,27 +34,32 @@ const PlacesResultSchema = zod.object({
 
 type PlacesResult = zod.infer<typeof PlacesResultSchema>;
 
+type ApiResult<Item> = {
+  total: number;
+  results: Array<Item>;
+};
+
+function useData<Item>(
+  path: string,
+  schema: zod.Schema<ApiResult<Item>>
+): null | ApiResult<Item> {
+  const [data, setData] = useState<null | ApiResult<Item>>(null);
+
+  useEffect(() => {
+    fetch(`http://localhost:3001/${path}`)
+      .then((res) => res.json())
+      .then((data) => {
+        const validatedData = schema.parse(data);
+        setData(validatedData);
+      });
+  }, []);
+
+  return data;
+}
+
 function App() {
-  const [workouts, setWorkouts] = useState<null | WorkoutsResult>(null);
-  const [places, setPlaces] = useState<null | PlacesResult>(null);
-
-  useEffect(() => {
-    fetch("http://localhost:3001/workouts")
-      .then((res) => res.json())
-      .then((data) => {
-        const validatedData = WorkoutsResultSchema.parse(data);
-        setWorkouts(validatedData);
-      });
-  }, []);
-
-  useEffect(() => {
-    fetch("http://localhost:3001/places")
-      .then((res) => res.json())
-      .then((data) => {
-        const validatedData = PlacesResultSchema.parse(data);
-        setPlaces(validatedData);
-      });
-  }, []);
+  const workouts = useData("workouts", WorkoutsResultSchema);
+  const places = useData("places", PlacesResultSchema);
 
   return (
     <div
