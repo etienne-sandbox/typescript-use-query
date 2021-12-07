@@ -1,21 +1,24 @@
 import React, { useEffect, useState } from "react";
+import * as zod from "zod";
 
-type Workout = {
-  id: string;
-  date: string;
-  place: string;
-  distance: number;
-  duration: number;
-  user: string;
-  placeName: string;
-  speed: number;
-  userName: string;
-};
+const WorkoutSchema = zod.object({
+  id: zod.string(),
+  date: zod.string(),
+  place: zod.string(),
+  distance: zod.number(),
+  duration: zod.number(),
+  user: zod.string(),
+  placeName: zod.string(),
+  speed: zod.number(),
+  userName: zod.string(),
+});
 
-type WorkoutsResult = {
-  total: number;
-  results: Workout[];
-};
+const WorkoutsResultSchema = zod.object({
+  total: zod.number(),
+  results: zod.array(WorkoutSchema),
+});
+
+type WorkoutsResult = zod.infer<typeof WorkoutsResultSchema>;
 
 type Place = {
   image: string;
@@ -37,7 +40,8 @@ function App() {
     fetch("http://localhost:3001/workouts")
       .then((res) => res.json())
       .then((data) => {
-        setWorkouts(data);
+        const validatedData = WorkoutsResultSchema.parse(data);
+        setWorkouts(validatedData);
       });
   }, []);
 
@@ -67,7 +71,9 @@ function App() {
             workouts.results.map((workout) => {
               return (
                 <p key={workout.id}>
-                  {workout.date} - {workout.distance}m - {workout.duration}min
+                  {workout.userName.toUpperCase()} -{" "}
+                  {(workout.distance / 1000).toFixed(2)}km - {workout.duration}
+                  min
                 </p>
               );
             })
