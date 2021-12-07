@@ -20,17 +20,19 @@ const WorkoutsResultSchema = zod.object({
 
 type WorkoutsResult = zod.infer<typeof WorkoutsResultSchema>;
 
-type Place = {
-  image: string;
-  name: string;
-  slug: string;
-  workoutCount: number;
-};
+const PlaceSchema = zod.object({
+  image: zod.string(),
+  name: zod.string(),
+  slug: zod.string(),
+  workoutCount: zod.number(),
+});
 
-type PlacesResult = {
-  total: number;
-  results: Place[];
-};
+const PlacesResultSchema = zod.object({
+  total: zod.number(),
+  results: zod.array(PlaceSchema),
+});
+
+type PlacesResult = zod.infer<typeof PlacesResultSchema>;
 
 function App() {
   const [workouts, setWorkouts] = useState<null | WorkoutsResult>(null);
@@ -49,7 +51,8 @@ function App() {
     fetch("http://localhost:3001/places")
       .then((res) => res.json())
       .then((data) => {
-        setPlaces(data);
+        const validatedData = PlacesResultSchema.parse(data);
+        setPlaces(validatedData);
       });
   }, []);
 
